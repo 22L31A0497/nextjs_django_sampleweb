@@ -7,15 +7,14 @@ import Cookies from 'js-cookie';
 import { RootState } from '@/Store/store';
 import { useSelector } from 'react-redux';
 import { FaCartArrowDown } from 'react-icons/fa';
-import {CiDeliveryTruck} from 'react-icons/ci'
+import { CiDeliveryTruck } from 'react-icons/ci'
 import { MdFavorite } from 'react-icons/md';
-
 
 export default function Navbar() {
     const router = useRouter()
     const [Scrolled, setScrolled] = useState(false);
     const [isOpen, setIsOpen] = useState(false);
-    const user = useSelector((state : RootState) => state.User.userData)
+    const user = useSelector((state: RootState) => state.User.userData)
 
     useEffect(() => {
         window.onscroll = () => {
@@ -28,8 +27,6 @@ export default function Navbar() {
         setIsOpen(!isOpen);
     }
 
-
-
     const handleLogout = () => {
         Cookies.remove('token');
         localStorage.clear();
@@ -37,11 +34,13 @@ export default function Navbar() {
     }
 
     return (
-        <div className={`navbar ${Scrolled ? "bg-white/95  " : "bg-transparent"}  fixed text-white top-0 left-0 z-50`}>
+        <div className={`navbar ${Scrolled ? "bg-white/95" : "bg-transparent"} fixed text-white top-0 left-0 z-50`}>
             <div className="navbar-start">
                 <div className="dropdown">
                     <button onClick={toggleMenu} className="btn btn-active text-white btn-circle">
-                        <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 6h16M4 12h16M4 18h7" /></svg>
+                        <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 6h16M4 12h16M4 18h7" />
+                        </svg>
                     </button>
                     <ul className={`menu menu-compact dropdown-content mt-3 p-2 shadow text-black bg-gray-50 rounded-box w-52 ${isOpen ? 'block' : 'hidden'}`}>
                         <li onClick={toggleMenu}><Link href={'/'}>Homepage</Link></li>
@@ -50,9 +49,6 @@ export default function Navbar() {
                             <>
                                 <li onClick={toggleMenu}><Link href={"/order/view-orders"}>My Orders</Link></li>
                                 <li onClick={toggleMenu}><Link href={"/bookmark"}>Bookmarks</Link></li>
-                                {user.role === 'admin' && (
-                                    <li onClick={toggleMenu}><Link href={"/Dashboard"}>Dashboard</Link></li>
-                                )}
                             </>
                         )}
                     </ul>
@@ -60,21 +56,16 @@ export default function Navbar() {
             </div>
             <div className='navbar-end'>
                 <div className="flex-none">
-
-                    {
-                        user ?
-                        <div className='flex items-center justify-center  min-h-full'>
-                         <button onClick={handleLogout} className='btn text-white mx-2'>logout</button>
-                         <button onClick={() => router.push("/order/create-order")} className='btn btn-circle  mx-2'><FaCartArrowDown className='text-white text-xl' /></button>
-                         <button onClick={() => router.push("/bookmark")} className='btn btn-circle  mx-2'><MdFavorite className='text-white text-xl' /></button>
-                         <button onClick={() => router.push("/order/view-orders")} className='btn btn-circle  mx-2'><CiDeliveryTruck className='text-white text-xl' /></button>
-                         
+                    {user ? (
+                        <div className='flex items-center justify-center min-h-full'>
+                            <button onClick={handleLogout} className='btn text-white mx-2'>Logout</button>
+                            <button onClick={() => router.push("/order/create-order")} className='btn btn-circle mx-2'><FaCartArrowDown className='text-white text-xl' /></button>
+                            <button onClick={() => router.push("/bookmark")} className='btn btn-circle mx-2'><MdFavorite className='text-white text-xl' /></button>
+                            <button onClick={() => router.push("/order/view-orders")} className='btn btn-circle mx-2'><CiDeliveryTruck className='text-white text-xl' /></button>
                         </div>
-                            :
-                            <button onClick={() => router.push('/auth/login')} className='btn text-white mx-2'>Login</button>
-                    }
-
-
+                    ) : (
+                        <button onClick={() => router.push('/auth/login')} className='btn text-white mx-2'>Login</button>
+                    )}
                 </div>
             </div>
         </div>
