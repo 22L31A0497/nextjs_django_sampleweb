@@ -1,4 +1,4 @@
-import connectDB from "@/lib/connectDB";
+import connectDB from "../../../../../lib/connectDB";
 import AuthCheck from "../../../../../middleware/AuthCheck";
 import { NextResponse } from "next/server";
 import Category from "../../../../../model/Category";
