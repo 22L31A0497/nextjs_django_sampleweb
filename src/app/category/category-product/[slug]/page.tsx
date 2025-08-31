@@ -5,7 +5,7 @@ import {
   get_product_by_category_name,
 } from "@/Services/Admin/product"
 import Loading from "@/app/loading"
-import ProductCard from "@/components/ProductCard" // corrected import path
+import ProductCard from "@/app/components/ProductCard" // corrected import path
 import Link from "next/link"
 import React, { useEffect, useState } from "react"
 import { toast, ToastContainer } from "react-toastify"
@@ -19,7 +19,7 @@ type ProductData = {
   productName: string
   productImage: string
   productSlug: string
-  productPrice: number
+  productPrice: string
   productFeatured: boolean
   productCategory: {
     categoryName: string
@@ -89,3 +89,4 @@ export default function Page({ params }: { params: pageParam }) {
     </div>
   )
 }
+
