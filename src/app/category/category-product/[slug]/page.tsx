@@ -8,7 +8,7 @@ import Loading from "@/app/loading"
 import ProductCard from "@/app/components/ProductCard" // corrected import path
 import Link from "next/link"
 import React, { useEffect, useState } from "react"
-import { toast, ToastContainer } from "react-toastify"
+import { ToastContainer, toast } from "react-toastify"
 import useSWR from "swr"
 
 interface pageParam {
@@ -44,11 +44,12 @@ export default function Page({ params }: { params: pageParam }) {
   )
 
   useEffect(() => {
-    if (data?.success !== true) {
-      if (data?.message) toast.error(data?.message)
-    } else {
+    if (data?.success) {
       setThisProdData(data?.data || [])
+      // Optional: show success toast when products are successfully fetched
+      // toast.success(`Loaded ${data?.data?.length || 0} products`)
     }
+    // Removed all toast.error calls
   }, [data])
 
   return (
@@ -89,5 +90,3 @@ export default function Page({ params }: { params: pageParam }) {
     </div>
   )
 }
-
-
