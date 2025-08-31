@@ -1,5 +1,6 @@
 import User from '../../../../model/User';
-import connectDB from '@/app/components/DB/connectDB';
+import connectDB from "../../../../lib/connectDB";
+
 import Joi from 'joi';
 import { hash } from 'bcryptjs';
 import { NextResponse } from 'next/server';
