@@ -1,134 +1,73 @@
-"use client"
+"use client";
 
-import Image from 'next/image'
-import { useRouter } from 'next/navigation'
-import React from 'react'
-import { BsCartPlus } from 'react-icons/bs'
-import { MdFavorite } from 'react-icons/md'
-import { toast, ToastContainer } from 'react-toastify'
-import { useSelector } from 'react-redux'
-import { RootState } from '@/Store/store'
-import Cookies from 'js-cookie'
-import { add_to_cart } from '@/Services/common/cart'
-import { bookmark_product } from '@/Services/common/bookmark'
+import React, { useState, useEffect, FormEvent } from "react";
+import { useRouter } from "next/navigation";
+import { ToastContainer, toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
+import { login_me } from "@/Services/auth";
+import Cookies from "js-cookie";
+import { TailSpin } from "react-loader-spinner";
 
-type ProductData = {
-  productName: string
-  productImage: string
-  productSlug: string
-  productPrice: number
-  productFeatured: boolean
-  productCategory: {
-    categoryName: string
-    categoryDescription: string
-    _id: string
-  }
-  _id: string
-}
+export default function Login() {
+  const router = useRouter();
+  const [formData, setFormData] = useState({ email: "", password: "" });
+  const [loading, setLoading] = useState(false);
 
-type UserData = {
-  email: string
-  name: string
-  _id: string
-  role?: string
-}
+  useEffect(() => {
+    if (Cookies.get("token")) router.push("/");
+  }, [router]);
 
-export default function StaticProductCard({
-  productName,
-  productFeatured,
-  productImage,
-  productCategory,
-  productPrice,
-  _id,
-  productSlug
-}: ProductData) {
-  const router = useRouter()
-  const user = useSelector((state: RootState) => state.User.userData) as UserData | null
-  const isAuthenticated = !!Cookies.get('token') && !!user
+  const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    setLoading(true);
 
-  const redirectToLogin = () => {
-    Cookies.remove('token')
-    router.push('/auth/login')
-  }
-
-  const AddToCart = async (e: React.MouseEvent) => {
-    e.stopPropagation()
-    if (!isAuthenticated || !user?._id) {
-      redirectToLogin()
-      return
+    if (!formData.email || !formData.password) {
+      toast.error("All fields are required");
+      setLoading(false);
+      return;
     }
 
-    try {
-      const res = await add_to_cart({ productID: _id, userID: user._id })
-      if (res?.success) {
-        toast.success(`${productName} added to cart successfully!`)
-      }
-      // Removed toast for failure
-    } catch {
-      // removed toast
-    }
-  }
+    const data = await login_me(formData);
+    setLoading(false);
 
-  const AddToBookmark = async (e: React.MouseEvent) => {
-    e.stopPropagation()
-    if (!isAuthenticated || !user?._id) {
-      redirectToLogin()
-      return
+    if (data.success) {
+      Cookies.set("token", data.token);
+      toast.success(data.message || "Login successful");
+      setTimeout(() => router.push("/"), 1500);
+    } else {
+      toast.error(data.message || "Login failed");
     }
-
-    try {
-      const res = await bookmark_product({ productID: _id, userID: user._id })
-      if (res?.success) {
-        toast.success(`${productName} bookmarked successfully!`)
-      }
-      // Removed toast for failure
-    } catch {
-      // removed toast
-    }
-  }
-
-  const handleProductClick = () => {
-    router.push(`/product/product-detail/${_id}`)
-  }
+  };
 
   return (
-    <>
-      <div
-        onClick={handleProductClick}
-        className="card text-black cursor-pointer card-compact m-3 w-80 bg-white shadow-xl relative"
-      >
-        <div className="w-full rounded relative h-60">
-          <Image
-            src={productImage || '/images98.jpg'}
-            alt={productName}
-            fill
-            className="rounded object-cover"
+    <div className="w-full h-screen bg-gray-50 flex items-center justify-center">
+      <div className="w-full max-w-md bg-white rounded-lg shadow p-8 text-black">
+        <h1 className="text-2xl font-bold text-center mb-6">Login</h1>
+        <form onSubmit={handleSubmit} className="space-y-4">
+          <input
+            type="email"
+            placeholder="Email"
+            value={formData.email}
+            onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+            className="w-full border p-2 rounded"
           />
+          <input
+            type="password"
+            placeholder="Password"
+            value={formData.password}
+            onChange={(e) => setFormData({ ...formData, password: e.target.value })}
+            className="w-full border p-2 rounded"
+          />
+
           <button
-            onClick={AddToBookmark}
-            aria-label="Bookmark Product"
-            className="btn btn-circle btn-ghost absolute top-2 right-2 hover:bg-orange-100"
-            title={isAuthenticated ? "Bookmark Product" : "Login to Bookmark"}
+            type="submit"
+            className="w-full bg-orange-600 text-white p-2 rounded flex justify-center"
           >
-            <MdFavorite className="text-2xl text-orange-600 font-semibold" />
+            {loading ? <TailSpin height="20" width="20" color="white" /> : "Login"}
           </button>
-        </div>
-        <div className="card-body">
-          <h2 className="card-title">{productName}</h2>
-          <p className="font-semibold">{`Rs ${productPrice}`}</p>
-          <div className="card-actions justify-end z-20">
-            <button
-              onClick={AddToCart}
-              aria-label="Add to Cart"
-              className="btn btn-circle btn-ghost hover:bg-orange-100"
-              title={isAuthenticated ? "Add to Cart" : "Login to Add to Cart"}
-            >
-              <BsCartPlus className="text-2xl text-orange-600 font-semibold" />
-            </button>
-          </div>
-        </div>
+        </form>
       </div>
       <ToastContainer />
-    </>
-  )
+    </div>
+  );
 }
