@@ -1,18 +1,17 @@
-import connectDB from "@/app/components/DB/connectDB";
+import connectDB from "@/lib/connectDB";
 import { NextResponse } from "next/server";
 import Order from "../../../../../model/Order";
 import AuthCheck from "../../../../../middleware/AuthCheck";
 import Product from "../../../../../model/Product";
 import User from "../../../../../model/User";
 
-export const dynamic = 'force-dynamic'
+export const dynamic = 'force-dynamic';
 
 export async function GET(req: Request) {
   await connectDB();
   try {
-
-    const registerProductModel =  await Product.init();
-    const registerUserModel =  await User.init();
+    await Product.init();
+    await User.init();
 
     const isAuthenticated = await AuthCheck(req);
 
@@ -21,13 +20,12 @@ export async function GET(req: Request) {
       if (getData) {
         return NextResponse.json({ success: true, data: getData });
       } else {
-        return NextResponse.json({ status: 204, success: false, message: 'No bookmark Item found.' });
+        return NextResponse.json({ status: 204, success: false, message: 'No order found.' });
       }
 
     } else {
-      return NextResponse.json({ success: false, message: "You are not authorized Please login!" });
+      return NextResponse.json({ success: false, message: "You are not authorized. Please login!" });
     }
-
 
   } catch (error) {
     console.log('Error in getting all Orders data :', error);
