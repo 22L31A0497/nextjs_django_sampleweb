@@ -1,4 +1,4 @@
-import connectDB from '@/app/components/DB/connectDB';
+import connectDB from "../../../../../lib/connectDB";
 import User from '../../../../model/User';
 import Joi from 'joi';
 import { compare } from 'bcryptjs';
