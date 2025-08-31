@@ -1,43 +1,29 @@
-"use client"
+"use client";
 
-import React, { useState, useEffect, FormEvent } from 'react'
-import Link from 'next/link'
-import { ToastContainer, toast } from 'react-toastify';
-import 'react-toastify/dist/ReactToastify.css';
-import { register_me } from '@/Services/auth';
-import { useRouter } from 'next/navigation';
-import Cookies from 'js-cookie';
-import { TailSpin } from 'react-loader-spinner';
+import React, { useState, useEffect, FormEvent } from "react";
+import Link from "next/link";
+import { ToastContainer, toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
+import { register_me } from "@/Services/auth";
+import { useRouter } from "next/navigation";
+import Cookies from "js-cookie";
+import { TailSpin } from "react-loader-spinner";
 
 export default function Register() {
   const router = useRouter();
-
-  useEffect(() => {
-    if (Cookies.get('token')) {
-      router.push('/');
-    }
-  }, [router]);
-
-  const [formData, setFormData] = useState({ email: "", password: "", name: "" });
-  const [error, setError] = useState({ email: "", password: "", name: '' });
+  const [formData, setFormData] = useState({ name: "", email: "", password: "" });
   const [loading, setLoading] = useState(false);
 
-  const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
-    event.preventDefault();
+  useEffect(() => {
+    if (Cookies.get("token")) router.push("/");
+  }, [router]);
+
+  const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
     setLoading(true);
 
-    if (!formData.email) {
-      setError({ ...error, email: "Email Field is Required" })
-      setLoading(false);
-      return;
-    }
-    if (!formData.password) {
-      setError({ ...error, password: "Password Field is required" })
-      setLoading(false);
-      return;
-    }
-    if (!formData.name) {
-      setError({ ...error, name: "Name Field is required" })
+    if (!formData.name || !formData.email || !formData.password) {
+      toast.error("All fields are required");
       setLoading(false);
       return;
     }
@@ -46,56 +32,53 @@ export default function Register() {
     setLoading(false);
 
     if (data.success) {
-      toast.success(data.message);
-      setTimeout(() => {
-        router.push('/auth/login');
-      }, 2000);
+      toast.success(data.message || "Registered successfully!");
+      setTimeout(() => router.push("/auth/login"), 1500);
+    } else {
+      toast.error(data.message || "Registration failed");
     }
-    // Removed toast on failure
-  }
+  };
 
   return (
-    <div className='w-full h-screen bg-gray-50'>
-      <div className="flex flex-col text-center items-center justify-center px-6 py-8 mx-auto h-screen lg:py-0 shadow-xl">
-        <div className="w-full bg-white rounded-lg shadow text-black md:mt-0 sm:max-w-md xl:p-0">
-          <div className="p-6 space-y-4 md:space-y-6 sm:p-8">
-            <h1 className="text-xl font-bold leading-tight tracking-tight text-gray-900 md:text-2xl">
-              Register your account
-            </h1>
-            <form onSubmit={handleSubmit} className="space-y-4 md:space-y-6" action="#">
-              <div className='text-left'>
-                <label htmlFor="name" className="block mb-2 text-sm font-medium text-gray-900">Your Name</label>
-                <input onChange={(e) => setFormData({ ...formData, name: e.target.value })} type="text" name="name" id="name" className="bg-gray-50 border border-gray-300 text-gray-900 sm:text-sm rounded-lg focus:ring-orange-600 focus:border-orange-600 block w-full p-2.5" placeholder="Name" />
-                {error.name && <p className="text-sm text-red-500">{error.name}</p>}
-              </div>
-              <div className='text-left'>
-                <label htmlFor="email" className="block mb-2 text-sm font-medium text-gray-900">Your email</label>
-                <input onChange={(e) => setFormData({ ...formData, email: e.target.value })} type="email" name="email" id="email" className="bg-gray-50 border border-gray-300 text-gray-900 sm:text-sm rounded-lg focus:ring-orange-600 focus:border-orange-600 block w-full p-2.5" placeholder="name@company.com" />
-                {error.email && <p className="text-sm text-red-500">{error.email}</p>}
-              </div>
-              <div className='text-left'>
-                <label htmlFor="password" className="block mb-2 text-sm font-medium text-gray-900">Password</label>
-                <input onChange={(e) => setFormData({ ...formData, password: e.target.value })} type="password" name="password" id="password" placeholder="••••••••" className="bg-gray-50 border border-gray-300 text-gray-900 sm:text-sm rounded-lg focus:ring-orange-600 focus:border-orange-600 block w-full p-2.5" />
-                {error.password && <p className="text-sm text-red-500">{error.password}</p>}
-              </div>
+    <div className="w-full h-screen bg-gray-50 flex items-center justify-center">
+      <div className="w-full max-w-md bg-white rounded-lg shadow p-8 text-black">
+        <h1 className="text-2xl font-bold text-center mb-6">Register</h1>
+        <form onSubmit={handleSubmit} className="space-y-4">
+          <input
+            type="text"
+            placeholder="Name"
+            value={formData.name}
+            onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+            className="w-full border p-2 rounded"
+          />
+          <input
+            type="email"
+            placeholder="Email"
+            value={formData.email}
+            onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+            className="w-full border p-2 rounded"
+          />
+          <input
+            type="password"
+            placeholder="Password"
+            value={formData.password}
+            onChange={(e) => setFormData({ ...formData, password: e.target.value })}
+            className="w-full border p-2 rounded"
+          />
 
-              {loading ? (
-                <button type="button" className="w-full flex items-center justify-center text-white bg-orange-600 hover:bg-orange-700 focus:ring-4 focus:outline-none focus:ring-orange-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center">
-                  <TailSpin height="20" width="20" color="white" ariaLabel="tail-spin-loading" radius="1" wrapperStyle={{}} wrapperClass="" visible={true} />
-                </button>
-              ) : (
-                <button type="submit" className="w-full text-white bg-orange-600 hover:bg-orange-700 focus:ring-4 focus:outline-none focus:ring-orange-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center">Sign up</button>
-              )}
-
-              <p className="text-sm text-gray-500">
-                Already have an account <Link href="/auth/login" className="font-medium text-orange-600 hover:underline">Sign In</Link>
-              </p>
-            </form>
-          </div>
-        </div>
+          <button
+            type="submit"
+            className="w-full bg-orange-600 text-white p-2 rounded flex justify-center"
+          >
+            {loading ? <TailSpin height="20" width="20" color="white" /> : "Sign Up"}
+          </button>
+        </form>
+        <p className="text-sm text-center mt-4">
+          Already have an account?{" "}
+          <Link href="/auth/login" className="text-orange-600 font-medium">Login</Link>
+        </p>
       </div>
-
       <ToastContainer />
     </div>
-  )
+  );
 }
