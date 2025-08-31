@@ -7,7 +7,7 @@ type ProductData = {
     productName: string;
     productImage: string;
     productSlug: string;
-    productPrice: string;
+    productPrice: number;
     productFeatured: boolean;
     productCategory: {
         categoryName: string;
