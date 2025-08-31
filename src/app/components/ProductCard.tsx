@@ -21,7 +21,7 @@ type ProductCardProps = {
   _id: string;
 };
 
-export default function StaticProductCard({
+export default function ProductCard({
   productName,
   productImage,
   productSlug,
@@ -34,63 +34,54 @@ export default function StaticProductCard({
     const existingCart = JSON.parse(localStorage.getItem("cart") || "[]");
     const alreadyInCart = existingCart.find((item: any) => item._id === _id);
 
-    let updatedCart;
-    if (alreadyInCart) {
-      updatedCart = existingCart.map((item: any) =>
-        item._id === _id ? { ...item, quantity: item.quantity + 1 } : item
-      );
-    } else {
-      updatedCart = [
-        ...existingCart,
-        { _id, productName, productPrice, productImage, quantity: 1 },
-      ];
-    }
+    const updatedCart = alreadyInCart
+      ? existingCart.map((item: any) =>
+          item._id === _id ? { ...item, quantity: item.quantity + 1 } : item
+        )
+      : [...existingCart, { _id, productName, productPrice, productImage, quantity: 1 }];
 
     localStorage.setItem("cart", JSON.stringify(updatedCart));
     toast.success(`${productName} added to cart!`);
   };
 
   const AddToBookmark = () => {
-    const existingBookmarks = JSON.parse(
-      localStorage.getItem("bookmarks") || "[]"
-    );
-    const alreadyBookmarked = existingBookmarks.find(
-      (item: any) => item._id === _id
-    );
+    const existingBookmarks = JSON.parse(localStorage.getItem("bookmarks") || "[]");
+    const alreadyBookmarked = existingBookmarks.find((item: any) => item._id === _id);
 
     if (alreadyBookmarked) {
       toast.info(`${productName} is already bookmarked`);
       return;
     }
 
-    const updatedBookmarks = [
-      ...existingBookmarks,
-      { _id, productName, productPrice, productImage },
-    ];
+    const updatedBookmarks = [...existingBookmarks, { _id, productName, productPrice, productImage }];
     localStorage.setItem("bookmarks", JSON.stringify(updatedBookmarks));
     toast.success(`${productName} bookmarked!`);
   };
 
   return (
     <div className="card text-black cursor-pointer card-compact m-3 w-80 bg-white shadow-xl relative">
+      {/* Main clickable image using dynamic route */}
       <Link
-        href={`/product/${productSlug}`}
+        href={{
+          pathname: "/product/[slug]",
+          query: { slug: productSlug },
+        }}
         className="w-full rounded relative h-60 block"
       >
         <Image
           src={productImage || "/images98.jpg"}
           alt={productName}
-          className="rounded"
           fill
+          className="rounded object-cover"
         />
       </Link>
 
       <div className="card-body">
-        <Link href={`/product/${productSlug}`}>
+        <Link href={{ pathname: "/product/[slug]", query: { slug: productSlug } }}>
           <h2 className="card-title">{productName}</h2>
         </Link>
 
-        <Link href={`/product/${productSlug}`}>
+        <Link href={{ pathname: "/product/[slug]", query: { slug: productSlug } }}>
           <p className="font-semibold">Rs {productPrice}</p>
         </Link>
       </div>
