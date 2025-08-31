@@ -89,7 +89,11 @@ export default function StaticProductCard({
   }
 
   const handleProductClick = () => {
-    router.push(`/product/product-detail/${_id}`)
+    // Navigate using dynamic route
+    router.push({
+      pathname: '/product/product-detail/[id]',
+      query: { id: _id }
+    })
   }
 
   return (
