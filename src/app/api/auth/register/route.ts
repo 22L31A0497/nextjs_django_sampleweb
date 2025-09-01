@@ -1,4 +1,4 @@
-import connectDB from "../../../../../lib/connectDB";
+import connectDB from "@/lib/connectDB";
 import User from '../../../../model/User';
 import Joi from 'joi';
 import { NextResponse } from 'next/server';
